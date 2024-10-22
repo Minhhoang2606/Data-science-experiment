@@ -1,4 +1,15 @@
+"""
+Linear Regression Model
+
+This script trains a linear regression model on the MPG dataset.
+"""
 # Import libraries
+from datetime import datetime
+from yellowbrick.regressor import ResidualsPlot
+from yellowbrick.regressor import PredictionError
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.linear_model import LinearRegression
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -12,7 +23,7 @@ mpg_df.head()
 mpg_df.info()
 print(mpg_df.isnull().sum())
 
-# Drop the 'name' column since it is it typically contains unique, non-numeric values without any order that don't provide any meaningful information for the lm_model to learn from
+# Drop the 'name' column
 mpg_df.drop('name', axis=1, inplace=True)
 
 # Summary of the dataset
@@ -47,8 +58,6 @@ sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, linewidth
 plt.title("Feature Correlation Heatmap")
 plt.show()
 
-from datetime import datetime
-
 # Drop 'acceleration' and 'displacement' to avoid multicollinearity
 mpg_df.drop(["acceleration", "displacement"], axis=1, inplace=True)
 
@@ -62,7 +71,6 @@ mpg_df = pd.get_dummies(mpg_df, columns=['origin'], drop_first=True)
 mpg_df.head()
 
 # Model building
-from sklearn.model_selection import train_test_split
 
 # Define the features and target variable
 X = mpg_df.drop("mpg", axis=1)
@@ -71,16 +79,11 @@ y = mpg_df["mpg"]
 # Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-from sklearn.linear_model import LinearRegression
-
 # Initialize the linear regression lm_model
 lm_model = LinearRegression()
 
 # Train the lm_model on the training data
 lm_model.fit(X_train, y_train)
-
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import numpy as np
 
 # Make predictions on the test set
 y_pred = lm_model.predict(X_test)
@@ -97,7 +100,6 @@ print(f"R-squared (R²): {r2}")
 
 # Prediction error plot
 # !pip install yellowbrick
-from yellowbrick.regressor import PredictionError
 
 # Instantiate the visualizer
 visualizer = PredictionError(lm_model)
@@ -106,12 +108,9 @@ visualizer.fit(X_train, y_train)  # Fit the training data to the visualizer
 visualizer.score(X_test, y_test)  # Evaluate the model on the test data
 visualizer.show() # Finalize and render the figure
 
-from yellowbrick.regressor import ResidualsPlot
-
 # Instantiate the visualizer
 visualizer = ResidualsPlot(lm_model)
 
 visualizer.fit(X_train, y_train) # Fit the training data to the visualizer
 visualizer.score(X_test, y_test) # Evaluate the model on the test data
-
 visualizer.show() # Finalize and render the figure
